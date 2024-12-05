@@ -9,27 +9,63 @@ import (
 	"strconv"
 	"strings"
 )
-func main(){
-    data := load("data")
-    result1 := sumValidMiddles(data)
-    fmt.Printf("Result 1: %d", result1)
+
+func main() {
+	data := load("data")
+	result1 := sumValidMiddles(data)
+	result2 := correctAndSumInvalidMiddles(data)
+	fmt.Printf("Result 1: %d", result1)
+	fmt.Printf("Result 1: %d", result2)
 }
 
+func sumValidMiddles(queue printQueue) int {
+	sum := 0
+	for _, up := range queue.updates {
+		if up.satisfies(queue.rules) {
+			sum += up.getMiddle()
+		}
+	}
+	return sum
+}
 
-func sumValidMiddles(queue printQueue) int{
-    sum := 0
-    for _, up := range(queue.updates){
-        if up.satisfies(queue.rules){
-            sum += up.getMiddle()
+func correctAndSumInvalidMiddles(queue printQueue) int {
+	sum := 0
+	for _, up := range queue.updates {
+		if up.satisfies(queue.rules) {
+			continue
+		}
+		corrected := correctTo(up, queue.rules)
+		sum += corrected.getMiddle()
+	}
+	return sum
+}
 
-            fmt.Println(up.getMiddle())
-        }
-    }
-    return sum;
+func correctTo(u update, rules map[int][]int) update {
+	for i := len(u) - 1; i >= 0; i-- {
+		u = correctAtIndex(u, rules, i)
+	}
+	return u
+}
+
+func correctAtIndex(u update, rules map[int][]int, i int) update {
+	val := u[i]
+	mustBeBeforeAll := rules[val]
+	resultingIndex := i
+	for _, mustBeBefore := range mustBeBeforeAll {
+		matchingIndex := slices.Index(u[:i], mustBeBefore)
+		if -1 != matchingIndex && matchingIndex < resultingIndex {
+			resultingIndex = matchingIndex
+		}
+	}
+	if i != resultingIndex {
+		u = slices.Delete(u, i, i+1)
+		u = slices.Insert(u, resultingIndex, val)
+		u = correctAtIndex(u, rules, i)
+	}
+	return u
 }
 
 func load(name string) printQueue {
-
 	file, err := os.Open(name)
 	if err != nil {
 		log.Fatal(err)
@@ -44,7 +80,6 @@ func load(name string) printQueue {
 			break
 		}
 		rule, err := parseRule(text)
-        fmt.Println(rule)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -73,28 +108,22 @@ func load(name string) printQueue {
 }
 
 func (up update) getMiddle() int {
-	return up[(len(up)/2)]
+	return up[(len(up) / 2)]
 }
 
 func (up update) satisfies(rules map[int][]int) bool {
-    fmt.Println(up)
 	for index, val := range up {
 		mustBeBefore := rules[val]
-        fmt.Printf("must be before %v",mustBeBefore)
 		for _, val := range mustBeBefore {
 			if slices.Contains(up[:index], val) {
-                fmt.Printf("failure contains %d before index %d", val, index)
 				return false
 			}
 		}
 	}
-    fmt.Println("+++++++++++++++++++++") 
 	return true
-
 }
 
 func parseRule(s string) (rule, error) {
-
 	split := strings.Index(s, "|")
 	before, err := strconv.ParseInt(s[:split], 0, 0)
 	if err != nil {
