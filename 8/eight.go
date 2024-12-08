@@ -60,7 +60,6 @@ func findResonantAntiNodesInRange(g grid.Grid, coordinates []grid.Coordinate) []
 
 			diff := left.Minus(right)
 			for l := left; g.IsInGrid(l); l = l.Minus(diff) {
-				fmt.Println(l)
 				results = append(results, l)
 			}
 			for l := right; g.IsInGrid(l); l = l.Plus(diff) {
