@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -14,15 +13,5 @@ func TestSumBetween(t *testing.T){
 
 
 func TestMain(t *testing.T){
-    //main()
+    part2()
 }
-
-func TestRead(t *testing.T){
-    data := readData("data")
-    var sum int64
-    for _,da := range data {
-        sum += int64(da)
-    }
-    fmt.Println(sum)
-}
-
