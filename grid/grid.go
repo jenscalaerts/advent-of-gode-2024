@@ -19,9 +19,9 @@ func (c Coordinate) RotateRight() Coordinate {
 type Grid []string
 
 func (g Grid) Get(c Coordinate) byte {
-    if !g.IsInGrid(c) {
-        return 0
-    }
+	if !g.IsInGrid(c) {
+		return 0
+	}
 	val := g[c.Y][c.X]
 	return val
 }
@@ -83,10 +83,36 @@ func (g Grid) AsValueCoordinateMap() map[byte][]Coordinate {
 	return result
 }
 
-func (g Grid) IsInGrid(c Coordinate) bool{
+func (g Grid) IsInGrid(c Coordinate) bool {
 	return c.X >= 0 && c.X < len(g[0]) && c.Y >= 0 && c.Y < len(g)
 }
 
-func (l Coordinate)Minus(r Coordinate) Coordinate{
+func (l Coordinate) Minus(r Coordinate) Coordinate {
 	return Coordinate{l.X - r.X, l.Y - r.Y}
+}
+
+func (g Grid) GetCardinalAdjecents(c Coordinate) []AdjecentResult{
+	result := []AdjecentResult{}
+	for _, coord := range c.adjecents() {
+		symbol := g.Get(coord)
+		if symbol != 0 {
+			result = append(result, AdjecentResult{coord, symbol})
+		}
+	}
+    return result
+}
+
+type AdjecentResult struct {
+	Loc   Coordinate
+	Value byte
+}
+
+func (c Coordinate) adjecents() []Coordinate {
+	var coords = []Coordinate{
+		{c.X - 1, c.Y},
+		{c.X + 1, c.Y},
+		{c.X, c.Y - 1},
+		{c.X, c.Y + 1},
+	}
+	return coords
 }
