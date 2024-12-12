@@ -69,7 +69,7 @@ func (g *Grid) Set(c Coordinate, val byte) {
 }
 func (g Grid) Print() {
 	for _, row := range g {
-		fmt.Println(row)
+		fmt.Println([]byte(row))
 	}
 	fmt.Println()
 }
@@ -91,7 +91,7 @@ func (l Coordinate) Minus(r Coordinate) Coordinate {
 	return Coordinate{l.X - r.X, l.Y - r.Y}
 }
 
-func (g Grid) GetCardinalAdjecents(c Coordinate) []AdjecentResult{
+func (g Grid) GetCardinalAdjecents(c Coordinate) []AdjecentResult {
 	result := []AdjecentResult{}
 	for _, coord := range c.adjecents() {
 		symbol := g.Get(coord)
@@ -99,7 +99,7 @@ func (g Grid) GetCardinalAdjecents(c Coordinate) []AdjecentResult{
 			result = append(result, AdjecentResult{coord, symbol})
 		}
 	}
-    return result
+	return result
 }
 
 type AdjecentResult struct {
@@ -115,4 +115,23 @@ func (c Coordinate) adjecents() []Coordinate {
 		{c.X, c.Y + 1},
 	}
 	return coords
+}
+func (g Grid) Coordinates() []Coordinate {
+	coordinates := make([]Coordinate, len(g)*len(g[0]))
+	var i int
+	for y := range len(g) {
+		for x := range len(g[0]) {
+			coordinates[i] = Coordinate{x, y}
+			i++
+		}
+	}
+	return coordinates
+}
+
+func (g Grid) EmptyCopy() Grid {
+    data := []string{}
+	for range len(g) {
+        data = append(data, string(make([]byte, len(g[0]))))
+	}
+    return Grid(data)
 }
