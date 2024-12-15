@@ -135,3 +135,12 @@ func (g Grid) EmptyCopy() Grid {
 	}
     return Grid(data)
 }
+
+func CreateCoordinate(x,y int) Coordinate{
+    return Coordinate{x,y}
+}
+
+func (left Coordinate) DotProduct(right Coordinate)int{
+    return left.X * right.X + left.Y * right.Y
+}
+
