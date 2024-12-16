@@ -12,6 +12,10 @@ type Coordinate struct {
 	X, Y int
 }
 
+func (c Coordinate) RotateLeft() Coordinate {
+	return Coordinate{c.Y, -c.X}
+}
+
 func (c Coordinate) RotateRight() Coordinate {
 	return Coordinate{-c.Y, c.X}
 }
@@ -129,18 +133,17 @@ func (g Grid) Coordinates() []Coordinate {
 }
 
 func (g Grid) EmptyCopy() Grid {
-    data := []string{}
+	data := []string{}
 	for range len(g) {
-        data = append(data, string(make([]byte, len(g[0]))))
+		data = append(data, string(make([]byte, len(g[0]))))
 	}
-    return Grid(data)
+	return Grid(data)
 }
 
-func CreateCoordinate(x,y int) Coordinate{
-    return Coordinate{x,y}
+func CreateCoordinate(x, y int) Coordinate {
+	return Coordinate{x, y}
 }
 
-func (left Coordinate) DotProduct(right Coordinate)int{
-    return left.X * right.X + left.Y * right.Y
+func (left Coordinate) DotProduct(right Coordinate) int {
+	return left.X*right.X + left.Y*right.Y
 }
-
