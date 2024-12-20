@@ -88,7 +88,7 @@ func (g Grid) AsValueCoordinateMap() map[byte][]Coordinate {
 }
 
 func (g Grid) IsInGrid(c Coordinate) bool {
-	return c.isInBounds(len(g[0]), len(g))
+	return !c.isInNotInBounds(len(g[0]), len(g))
 }
 
 func (l Coordinate) Minus(r Coordinate) Coordinate {
@@ -149,12 +149,12 @@ func (left Coordinate) DotProduct(right Coordinate) int {
 	return left.X*right.X + left.Y*right.Y
 }
 
-func (c Coordinate) isInBounds(x, y int) bool {
+func (c Coordinate) isInNotInBounds(x, y int) bool {
 	return c.X < 0 || c.X >= x || c.Y < 0 || c.Y >= y
 }
 
 func (c Coordinate) GetAdjectents(boundx int, boundy int) []Coordinate {
 	return slices.DeleteFunc(c.adjecents(), func(c Coordinate) bool {
-		return c.isInBounds(boundx, boundy)
+		return c.isInNotInBounds(boundx, boundy)
 	})
 }
