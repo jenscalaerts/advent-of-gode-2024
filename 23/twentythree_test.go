@@ -6,6 +6,11 @@ import (
 )
 
 func TestTripletsPart(t *testing.T) {
-    data := readData("example")    
-    fmt.Println(data.findSets())
+    m, groups := readDateToMap("example")
+    groups = calculateNextGroupSize(m, groups)
+    fmt.Println(groups)
+    groups = calculateNextGroupSize(m,groups)
+    fmt.Println(groups)
+    groups = calculateNextGroupSize(m,groups)
+    fmt.Println(groups)
 }
