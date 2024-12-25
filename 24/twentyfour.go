@@ -14,19 +14,21 @@ const AND = "AND"
 type operation struct {
 	left, right, destination string
 	act                      action
+	actionDescription        string
 }
 
-func main(){
-    fmt.Println(part1(loadData("data")))
+func main() {
+	fmt.Println(runOperationsWithRegisters(loadData("data")))
 }
 
-func part1(ops []operation, registers map[string]bool) int {
+func runOperationsWithRegisters(ops []operation, registers map[string]bool) int {
 	registers = execute(ops, registers)
 	total := 0
 	for register, val := range registers {
 		if val && register[0] == 'z' {
 			total += (1 << parsing.Atoi(register[1:]))
 		}
+
 	}
 	return total
 }
@@ -43,10 +45,70 @@ func execute(ops []operation, registers map[string]bool) map[string]bool {
 				remaining = append(remaining, op)
 			}
 		}
+		if len(ops) == len(remaining) {
+			for _, op := range ops {
+				if op.hasZResult() {
+					findFeeding(registers, ops, op.destination, 0)
+					fmt.Println("\n===================")
+				}
+			}
+			fmt.Println("Fail")
+			break
+		}
+
 		ops = remaining
+
 	}
 	return registers
 
+}
+
+func findFeeding(registers map[string]bool, ops []operation, lookingFor string, depth int) {
+	tabDepth(depth, lookingFor)
+
+	found := false
+	for _, op := range ops {
+		if op.destination == lookingFor {
+			found = true
+			tabDepth(depth, fmt.Sprint(op))
+			_, foundLeft := registers[op.left]
+			if !foundLeft {
+				tabCrDepth(depth, "left(\n")
+				findFeeding(registers, ops, op.left, depth+1)
+				tabCrDepth(depth, ")")
+			} else {
+				tabCrDepth(depth, fmt.Sprintf("Left in registers %v with value %v", op.left, registers[op.left]))
+			}
+			_, foundRight := registers[op.right]
+
+			if !foundRight {
+				tabCrDepth(depth, "right(\n")
+				findFeeding(registers, ops, op.right, depth+1)
+				tabCrDepth(depth, ")")
+			} else {
+				tabCrDepth(depth, fmt.Sprintf("right in registers %v with value %v", op.left, registers[op.left]))
+			}
+		}
+
+	}
+	if !found {
+		tabDepth(depth, "Not found")
+	}
+
+}
+func tabDepth(i int, s string) {
+	for range i {
+		fmt.Print(" ")
+	}
+	fmt.Print(s)
+}
+
+func tabCrDepth(i int, s string) {
+	fmt.Print("\n")
+	for range i {
+		fmt.Print(" ")
+	}
+	fmt.Print(s)
 }
 
 func loadData(name string) ([]operation, map[string]bool) {
@@ -72,7 +134,7 @@ func loadData(name string) ([]operation, map[string]bool) {
 		default:
 			panic("unexpected operation")
 		}
-		operations = append(operations, operation{split[0], split[2], split[4], action})
+		operations = append(operations, operation{split[0], split[2], split[4], action, split[1]})
 
 	}
 	return operations, initialValuesRegisters
